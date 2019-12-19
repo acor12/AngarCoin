@@ -21,24 +21,27 @@ func (bc *Blockchain) Close() {
 }
 
 //GetBlock returns block by hash
-func (bc *Blockchain) GetBlock(hash string) (block *Block) {
+func (bc *Blockchain) GetBlock(hash []byte) (block *Block) {
 	// TODO
 	bc.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(bucketName)
 
-		encodedBlock := bucket.Get(hash)
+		bucket.Get(hash)
+		return nil
 	})
+	return
 }
 
 //Iterator create a blockchain iterator instance
-func (bc *Blockchain) Iterator() *blockchainIterator {
-	return &blockchainIterator{bc.Tip, bc}
+func (bc *Blockchain) Iterator() *BlockchainIterator {
+	return &BlockchainIterator{bc.Tip, bc}
 }
 
 //AddBlock appends block to the blockchain
 func (bc *Blockchain) AddBlock(block Block) {
 	bc.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(bucketName)
+		// bucket := tx.Bucket(bucketName)
+		return nil
 	})
 }
 
@@ -78,7 +81,7 @@ type BlockchainIterator struct {
 
 // Next returns the next block in the blockchain
 func (bci *BlockchainIterator) Next() (block *Block) {
-	block := bci.blockchain.GetBlock(bci.nextHash)
+	block = bci.blockchain.GetBlock(bci.nextHash)
 	bci.nextHash = block.PrevBlockHash
 	return block
 }
