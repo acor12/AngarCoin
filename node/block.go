@@ -8,39 +8,58 @@ import (
 
 // Block keeps block headers
 type Block struct {
-	Index         uint
-	Difficulty    int8
-	PrevBlockHash []byte
-	MinedBy       []byte
-	BlockDataHash []byte
-	Nonce         uint
-	DataCreated   int64
-	BlockHash     []byte
+	Index       uint
+	Difficulty  uint8
+	PrevHash    []byte
+	MinedBy     []byte
+	DataHash    []byte
+	Nonce       uint
+	DataCreated int64
+	Hash        []byte
 }
 
-// SetHash calculates and sets block hash
-func SetHash(PrevBlockHash []byte, blockDataHash []byte, DataCreated int64) []byte {
+// setHash calculates hash
+func setHash(dataHash []byte, data string, DataCreated int64) []byte {
 	blockData := map[string]interface{}{
-		"PrevBlockHash": PrevBlockHash,
-		"blockDataHash": blockDataHash,
-		"DataCreated":   DataCreated,
+		"Nonce":       nil,
+		"DataCreated": DataCreated,
+		"DataHash":    dataHash,
 	}
-	jsonData, _ := json.Marshal(blockData)
+	jsonBlock, _ := json.Marshal(blockData)
 	hasher := sha256.New()
-	hasher.Write(jsonData)
+	hasher.Write(jsonBlock)
 
 	return hasher.Sum(nil)
 }
 
-// NewBlock creates and returns Block
-func NewBlock(blockDataHash []byte, prevBlockHash []byte) *Block {
-	block := &Block{
-		PrevBlockHash: prevBlockHash,
-		BlockDataHash: blockDataHash,
-		DataCreated:   time.Now().Unix(),
-	}
+// setDataHash calculates data hash
+func setDataHash(prevHash string) []byte {
 
-	SetHash(prevBlockHash, blockDataHash, block.DataCreated)
+	dataHash := map[string]interface{}{
+		"Index":       nil,
+		"Difficulty":  nil,
+		"Transaction": nil,
+		"PrevHash":    prevHash,
+	}
+	jsonDataHash, _ := json.Marshal(dataHash)
+	hasher := sha256.New()
+	hasher.Write(jsonDataHash)
+	return hasher.Sum(nil)
+}
+
+// NewBlock creates and returns Block
+func NewBlock(data string, prevHash string) *Block {
+
+	dataCreated := time.Now().Unix()
+	dataHash := setDataHash(prevHash)
+	hash := setHash(dataHash, data, dataCreated)
+
+	block := &Block{
+		PrevHash:    []byte(prevHash),
+		DataHash:    dataHash,
+		DataCreated: dataCreated,
+		Hash:        hash,
+	}
 
 	return block
 }
