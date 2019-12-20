@@ -18,6 +18,19 @@ type Block struct {
 	BlockHash     []byte
 }
 
+//Serialize block into bytes
+func (b *Block) Serialize() []byte {
+	data, _ := json.Marshal(b)
+	return data
+}
+
+//Deserialize encoded block
+func Deserialize(serializedBlock []byte) *Block {
+	block := new(Block)
+	json.Unmarshal(serializedBlock, block)
+	return block
+}
+
 // SetHash calculates and sets block hash
 func SetHash(PrevBlockHash []byte, blockDataHash []byte, DataCreated int64) []byte {
 	blockData := map[string]interface{}{

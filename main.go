@@ -1,5 +1,11 @@
 package main
 
+import (
+	"github.com/acor12/AngarCoin/node"
+)
+
 func main() {
-	println("hello world")
+	block := node.NewBlock([]byte{}, []byte{})
+	println(block.Serialize())
+	println(node.Deserialize(block.Serialize()).BlockDataHash)
 }
