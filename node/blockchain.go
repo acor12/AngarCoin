@@ -40,7 +40,9 @@ func (bc *Blockchain) Iterator() *BlockchainIterator {
 //AddBlock appends block to the blockchain
 func (bc *Blockchain) AddBlock(block Block) {
 	bc.db.Update(func(tx *bolt.Tx) error {
-		// bucket := tx.Bucket(bucketName)
+		bucket := tx.Bucket(bucketName)
+		bucket.Put(block.Hash, block.Serialize())
+		bucket.Put([]byte("l"), block.Hash)
 		return nil
 	})
 }
@@ -82,6 +84,6 @@ type BlockchainIterator struct {
 // Next returns the next block in the blockchain
 func (bci *BlockchainIterator) Next() (block *Block) {
 	block = bci.blockchain.GetBlock(bci.nextHash)
-	bci.nextHash = block.PrevBlockHash
+	bci.nextHash = block.PrevHash
 	return block
 }
