@@ -8,6 +8,7 @@ import (
 // Block keeps block headers
 type Block struct {
 	Index       uint
+	Transaction []byte
 	Difficulty  uint8
 	PrevHash    []byte
 	MinedBy     []byte
@@ -15,6 +16,20 @@ type Block struct {
 	Nonce       uint
 	DateCreated int64
 	Hash        []byte
+}
+
+//GeneratedGenesisBlock  method
+func GeneratedGenesisBlock() *Block {
+
+	return &Block{
+		Index:       0,
+		Difficulty:  0,
+		Transaction: nil,
+		PrevHash:    []byte{},
+		MinedBy:     []byte{},
+		Nonce:       0,
+		DateCreated: 1576895721,
+	}
 }
 
 //Serialize block into bytes
