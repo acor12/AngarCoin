@@ -21,15 +21,18 @@ func (bc *Blockchain) Close() {
 }
 
 //GetBlock returns block by hash
-func (bc *Blockchain) GetBlock(hash []byte) (block *Block) {
-	// TODO
+func (bc *Blockchain) GetBlock(hash []byte) *Block {
+	var block *Block = nil
+
 	bc.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(bucketName)
-
-		bucket.Get(hash)
+		serialized := bucket.Get(hash)
+		if serialized != nil {
+			block = Deserialize(serialized)
+		}
 		return nil
 	})
-	return
+	return block
 }
 
 //Iterator create a blockchain iterator instance
@@ -60,9 +63,10 @@ func InitializeBlockchain() *Blockchain {
 		bucket := tx.Bucket(bucketName)
 		if bucket == nil {
 			bucket, err = tx.CreateBucket(bucketName)
-			err = bucket.Put([]byte("blockhash"), []byte("serialized block"))
-			err = bucket.Put([]byte("l"), []byte("last hash"))
-			tip = []byte("l")
+			genesis := GeneratedGenesisBlock()
+			err = bucket.Put(genesis.Hash, genesis.Serialize())
+			err = bucket.Put([]byte("l"), genesis.Hash)
+			tip = genesis.Hash
 			return err
 		}
 
