@@ -3,19 +3,18 @@ package node
 import (
 	"crypto/sha256"
 	"encoding/json"
-	"time"
 )
 
 // Block keeps block headers
 type Block struct {
-	Index         uint
-	Difficulty    int8
-	PrevBlockHash []byte
-	MinedBy       []byte
-	BlockDataHash []byte
-	Nonce         uint
-	DataCreated   int64
-	BlockHash     []byte
+	Index       uint
+	Difficulty  uint8
+	PrevHash    []byte
+	MinedBy     []byte
+	DataHash    []byte
+	Nonce       uint
+	DataCreated int64
+	Hash        []byte
 }
 
 //Serialize block into bytes
@@ -31,29 +30,43 @@ func Deserialize(serializedBlock []byte) *Block {
 	return block
 }
 
-// SetHash calculates and sets block hash
-func SetHash(PrevBlockHash []byte, blockDataHash []byte, DataCreated int64) []byte {
+// setHash calculates hash
+func setHash(dataHash []byte, data string, DataCreated int64) []byte {
 	blockData := map[string]interface{}{
-		"PrevBlockHash": PrevBlockHash,
-		"blockDataHash": blockDataHash,
-		"DataCreated":   DataCreated,
+		"Nonce":       nil,
+		"DataCreated": DataCreated,
+		"DataHash":    dataHash,
 	}
-	jsonData, _ := json.Marshal(blockData)
+	jsonBlock, _ := json.Marshal(blockData)
 	hasher := sha256.New()
-	hasher.Write(jsonData)
+	hasher.Write(jsonBlock)
 
 	return hasher.Sum(nil)
 }
 
-// NewBlock creates and returns Block
-func NewBlock(blockDataHash []byte, prevBlockHash []byte) *Block {
-	block := &Block{
-		PrevBlockHash: prevBlockHash,
-		BlockDataHash: blockDataHash,
-		DataCreated:   time.Now().Unix(),
-	}
+// setDataHash calculates data hash
+func setDataHash(prevHash string) []byte {
 
-	SetHash(prevBlockHash, blockDataHash, block.DataCreated)
+	dataHash := map[string]interface{}{
+		"Index":       nil,
+		"Difficulty":  nil,
+		"Transaction": nil,
+		"PrevHash":    prevHash,
+	}
+	jsonDataHash, _ := json.Marshal(dataHash)
+	hasher := sha256.New()
+	hasher.Write(jsonDataHash)
+	return hasher.Sum(nil)
+}
+
+// NewBlock creates and returns Block
+func NewBlock(index uint, difficulty uint8, prevHash string) *Block {
+
+	block := &Block{
+		Index:    index,
+		PrevHash: []byte(prevHash),
+		DataHash: setDataHash(prevHash),
+	}
 
 	return block
 }
