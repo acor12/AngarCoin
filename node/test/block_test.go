@@ -16,3 +16,9 @@ func TestDeserialize(t *testing.T) {
 	serialized := block.Serialize()
 	assert.Equal(t, block.Index, node.Deserialize(serialized).Index)
 }
+
+func TestNewBlock(t *testing.T) {
+	block := node.NewBlock(0, 4, []byte{})
+	assert.NotNil(t, block.DataHash)
+	assert.Nil(t, block.Hash)
+}
