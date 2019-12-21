@@ -8,25 +8,25 @@ import (
 )
 
 func TestSerialize(t *testing.T) {
-	block := node.NewBlock(0, 0, []byte{})
+	block := node.NewBlock(0, 0, []byte{}, []byte{})
 	assert.NotEqual(t, len(block.Serialize()), 0)
 }
 
 func TestDeserialize(t *testing.T) {
-	block := node.NewBlock(0, 0, []byte{})
+	block := node.NewBlock(0, 0, []byte{}, []byte{})
 	serialized := block.Serialize()
 	assert.Equal(t, block.Index, node.Deserialize(serialized).Index)
 }
 
 func TestNewBlock(t *testing.T) {
-	block := node.NewBlock(0, 4, []byte{})
+	block := node.NewBlock(0, 4, []byte{}, []byte{})
 	assert.NotNil(t, block.DataHash)
 	assert.Nil(t, block.Hash)
 }
 
 func TestGeneratedGenesisBlock(t *testing.T) {
 	block := node.GeneratedGenesisBlock()
-	assert.Equal(t, block.Index, uint(0))
+	assert.Equal(t, block.Index, uint(1))
 	assert.Equal(t, block.Difficulty, uint8(0))
 	assert.Equal(t, block.Transaction, []uint8([]byte(nil)))
 	assert.Equal(t, block.PrevHash, []byte{})
