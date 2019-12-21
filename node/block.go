@@ -20,15 +20,18 @@ type Block struct {
 
 //GeneratedGenesisBlock  method
 func GeneratedGenesisBlock() *Block {
+	dataHash := setDataHash(1, 0, []byte{}, []byte{})
 
 	return &Block{
-		Index:       0,
+		Index:       1,
 		Difficulty:  0,
 		Transaction: nil,
 		PrevHash:    []byte{},
 		MinedBy:     []byte{},
 		Nonce:       0,
 		DateCreated: 1576895721,
+		DataHash:    dataHash,
+		Hash:        setHash(dataHash, 0, 1576895721),
 	}
 }
 
@@ -81,13 +84,14 @@ func setHash(dataHash []byte, nonce uint64, DataCreated int64) []byte {
 }
 
 // setDataHash calculates data hash
-func setDataHash(index uint, difficulty uint8, prevHash []byte) []byte {
+func setDataHash(index uint, difficulty uint8, prevHash []byte, minedBy []byte) []byte {
 
 	dataHash := map[string]interface{}{
 		"Index":       index,
 		"Difficulty":  difficulty,
 		"Transaction": nil,
 		"PrevHash":    prevHash,
+		"MinedBy":     minedBy,
 	}
 	jsonDataHash, _ := json.Marshal(dataHash)
 	hasher := sha256.New()
@@ -97,12 +101,12 @@ func setDataHash(index uint, difficulty uint8, prevHash []byte) []byte {
 }
 
 // NewBlock creates and returns Block
-func NewBlock(index uint, difficulty uint8, prevHash []byte) *Block {
+func NewBlock(index uint, difficulty uint8, prevHash []byte, minedBy []byte) *Block {
 
 	block := &Block{
 		Index:    index,
 		PrevHash: prevHash,
-		DataHash: setDataHash(index, difficulty, prevHash),
+		DataHash: setDataHash(index, difficulty, prevHash, minedBy),
 	}
 
 	return block
