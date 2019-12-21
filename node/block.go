@@ -13,7 +13,7 @@ type Block struct {
 	MinedBy     []byte
 	DataHash    []byte
 	Nonce       uint
-	DataCreated int64
+	DateCreated int64
 	Hash        []byte
 }
 
@@ -30,13 +30,34 @@ func Deserialize(serializedBlock []byte) *Block {
 	return block
 }
 
+// SetMinedData set the nonce, the date created and the hash to the block
+// return sfalse if the block is invalid otherwise returns true
+func (b *Block) SetMinedData(nonce uint, dateCreated int64) bool {
+	b.Nonce = nonce
+	b.DateCreated = dateCreated
+
+	return b.IsValid()
+}
+
+// IsValid returns true if the block hash valid data
+func (b *Block) IsValid() bool {
+	//TODO: complete this method
+	if b.Nonce == 0 || b.Difficulty == 0 ||
+		len(b.PrevHash) == 0 || len(b.DataHash) == 0 {
+		return false
+	}
+
+	return true
+}
+
 // setHash calculates hash
-func setHash(dataHash []byte, data string, DataCreated int64) []byte {
+func setHash(dataHash []byte, nonce uint64, DataCreated int64) []byte {
 	blockData := map[string]interface{}{
-		"Nonce":       nil,
+		"Nonce":       nonce,
 		"DataCreated": DataCreated,
 		"DataHash":    dataHash,
 	}
+
 	jsonBlock, _ := json.Marshal(blockData)
 	hasher := sha256.New()
 	hasher.Write(jsonBlock)
@@ -45,27 +66,28 @@ func setHash(dataHash []byte, data string, DataCreated int64) []byte {
 }
 
 // setDataHash calculates data hash
-func setDataHash(prevHash string) []byte {
+func setDataHash(index uint, difficulty uint8, prevHash []byte) []byte {
 
 	dataHash := map[string]interface{}{
-		"Index":       nil,
-		"Difficulty":  nil,
+		"Index":       index,
+		"Difficulty":  difficulty,
 		"Transaction": nil,
 		"PrevHash":    prevHash,
 	}
 	jsonDataHash, _ := json.Marshal(dataHash)
 	hasher := sha256.New()
 	hasher.Write(jsonDataHash)
+
 	return hasher.Sum(nil)
 }
 
 // NewBlock creates and returns Block
-func NewBlock(index uint, difficulty uint8, prevHash string) *Block {
+func NewBlock(index uint, difficulty uint8, prevHash []byte) *Block {
 
 	block := &Block{
 		Index:    index,
-		PrevHash: []byte(prevHash),
-		DataHash: setDataHash(prevHash),
+		PrevHash: prevHash,
+		DataHash: setDataHash(index, difficulty, prevHash),
 	}
 
 	return block
