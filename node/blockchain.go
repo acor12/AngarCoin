@@ -15,14 +15,14 @@ type Blockchain struct {
 	db  *bolt.DB
 }
 
-//Close database conection
+//Close database connection
 func (bc *Blockchain) Close() {
 	bc.db.Close()
 }
 
 //GetBlock returns block by hash
 func (bc *Blockchain) GetBlock(hash []byte) *Block {
-	var block *Block = nil
+	var block *Block
 
 	bc.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(bucketName)
