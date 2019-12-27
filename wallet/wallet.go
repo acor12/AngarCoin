@@ -72,6 +72,6 @@ func GenerateWalletFromMnemonic(mnemonic string) (*Wallet, error) {
 }
 
 //VerifySignature check if the signature is valid
-func VerifySignature(publicKey *ecdsa.PublicKey, data []byte, signature Signature) bool {
+func VerifySignature(publicKey *ecdsa.PublicKey, data []byte, signature *Signature) bool {
 	return ecdsa.Verify(publicKey, data, signature.R, signature.S)
 }
