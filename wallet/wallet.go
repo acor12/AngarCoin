@@ -1,21 +1,28 @@
 package wallet
 
 import (
+	"github.com/ethereum/go-ethereum/accounts"
 	hdwallet "github.com/miguelmota/go-ethereum-hdwallet"
-	"github.com/tyler-smith/go-bip39"
 )
 
 //Wallet struct
 type Wallet struct {
-	publicKey  []byte
-	privateKey []byte
-	address    []byte
+	PublicKey  []byte
+	PrivateKey []byte
+	Address    []byte
+	wallet     *hdwallet.Wallet
+	account    accounts.Account
+}
+
+//Sign the given data
+func (w *Wallet) Sign(data []byte) []byte {
+	signature, _ := w.wallet.SignText(w.account, data)
+	return signature
 }
 
 // GenerateMnemonic return a new mnemonic string
 func GenerateMnemonic() string {
-	entropy, _ := bip39.NewEntropy(256)
-	mnemonic, _ := bip39.NewMnemonic(entropy)
+	mnemonic, _ := hdwallet.NewMnemonic(256)
 	return mnemonic
 }
 
@@ -33,8 +40,10 @@ func GenerateWallet(mnemonic string) *Wallet {
 	publicKey, _ := wallet.PublicKeyBytes(account)
 
 	return &Wallet{
-		publicKey:  publicKey,
-		privateKey: privateKey,
-		address:    account.Address.Bytes(),
+		PublicKey:  publicKey,
+		PrivateKey: privateKey,
+		Address:    account.Address.Bytes(),
+		wallet:     wallet,
+		account:    account,
 	}
 }
